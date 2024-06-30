@@ -5,12 +5,12 @@ const options = require("./connection-options.json");
 function getUser(req, res) {
     var connection = mysql.createConnection(options);
     connection.connect();
-    var query = "SELECT id, name, birthDate, idCountry FROM users";
+    var query = "SELECT name, email, phone, password, user_type FROM projetofinalpw.users";
     connection.query(query, function (err, rows) {
       if (err) {
-        res.json({"message": "error", "error": err });
+        res.jstatus(400).son({"message": "error", "error": err });
       } else {
-        res.json({"message": "success", "user": rows });
+        res.status(200).json({"message": "success", "users": rows });
       }
       connection.end();
     });
@@ -19,12 +19,12 @@ function getUser(req, res) {
 function getUserById(req, res) {
     var connection = mysql.createConnection(options);
     connection.connect();
-    var query = "SELECT id, name, birthDate, idCountry FROM users WHERE id = ?";
+    var query = "SELECT name, email, phone, password, user_type FROM projetofinalpw.users WHERE id = ?";
     connection.query(query, [req.params.id], function (err, rows) {
       if (err) {
-        res.json({"message": "error", "error": err });
+        res.status(400).json({"message": "error", "error": err });
       } else {
-        res.json({"message": "success", "person": rows[0] });
+        res.status(200).json({"message": "success", "user": rows[0] });
       }
       connection.end();
     });
@@ -39,12 +39,12 @@ function createUser(req, res) {
       if (err) {
         res.status(400).json({"message": "error", "error": err });
       } else {
-        var query = "SELECT ID, name, email, phone, password, user_type FROM projetofinalpw.users WHERE id = ?;";
+        var query = "SELECT id, name, email, phone, password, user_type FROM projetofinalpw.users WHERE id = ?;";
         createConnection.query(query, result.insertId, function (err, rows){
           if (err) {
             res.status(400).json({"message": "error", "error": err });
           } else {
-            res.status(201).json({"message": "success", "person": rows[0] });
+            res.status(201).json({"message": "success", "user": rows[0] });
           }  
         });
       }
@@ -55,12 +55,20 @@ function createUser(req, res) {
 function updateUser(req, res) {
     var updateConnection = mysql.createConnection(options);
     updateConnection.connect();
-    var query = "UPDATE person SET name = ?, birthDate = ?, idCountry = ? WHERE id = ?";
-    updateConnection.query(query, [req.body.name, req.body.birthDate, req.body.idCountry, req.params.id], function (err, result) {
+    
+    var query = "UPDATE projetofinalpw.users SET name = ?, email = ?, phone = ?, password = ? , user_type= ? WHERE id = ?";
+    updateConnection.query(query, [req.body.name, req.body.email, req.body.phone, req.body.password, req.body.user_type, req.params.id], function (err, result) {
       if (err) {
-        res.json({"message": "error", "error": err });
+        res.status(400).json({"message": "error", "error": err });
       } else {
-        res.json({"message": "success", "person": req.params.id });
+        var query = "SELECT id, name, email, phone, password, user_type FROM projetofinalpw.users WHERE id = ?;";        
+        updateConnection.query(query, req.params.id, function (err, rows){
+          if (err) {
+            res.status(400).json({"message": "error", "error": err });
+          } else {
+            res.status(200).json({"message": "success", "user": rows[0] });           
+          }  
+        });
       }
       updateConnection.end();
     });
@@ -69,12 +77,12 @@ function updateUser(req, res) {
 function deleteUser(req, res) {
     var deleteConnection = mysql.createConnection(options);
     deleteConnection.connect();
-    var query = "DELETE FROM person WHERE id = ?";
+    var query = "DELETE FROM projetofinalpw.users WHERE id = ?";
     deleteConnection.query(query, [req.params.id], function (err, result) {
       if (err) {
-        res.json({"message": "error", "error": err });
+        res.status(400).json({"message": "error", "error": err });
       } else {
-        res.json({"message": "success", "person": req.params.id });
+        res.status(200).json({"message": "success", "user": req.params.id });
       }
       deleteConnection.end();
     });
