@@ -1,8 +1,8 @@
-
+const express = require('express');
 const mysql = require("mysql");
 const options = require("./connection-options.json");
 
-function getPeople(req, res) {
+function getUser(req, res) {
     var connection = mysql.createConnection(options);
     connection.connect();
     var query = "SELECT id, name, birthDate, idCountry FROM users";
@@ -10,13 +10,13 @@ function getPeople(req, res) {
       if (err) {
         res.json({"message": "error", "error": err });
       } else {
-        res.json({"message": "success", "people": rows });
+        res.json({"message": "success", "user": rows });
       }
       connection.end();
     });
   }
 
-function getPersonById(req, res) {
+function getUserById(req, res) {
     var connection = mysql.createConnection(options);
     connection.connect();
     var query = "SELECT id, name, birthDate, idCountry FROM users WHERE id = ?";
@@ -33,19 +33,26 @@ function getPersonById(req, res) {
 
 function createUser(req, res) {
     var createConnection = mysql.createConnection(options);
-    createConnection.connect();
-    var query = "INSERT INTO projetofinalpw.users(name, email, phone, password, type_use) VALUES(?, ?, ?, ?, ?)";
+    createConnection.connect();   
+    var query = "INSERT INTO projetofinalpw.users(name, email, phone, password, user_type) VALUES(?, ?, ?, ?, ?)";
     createConnection.query(query, [req.body.name, req.body.email, req.body.phone, req.body.password, req.body.user_type], function (err, result) {
       if (err) {
-        res.json({"message": "error", "error": err });
+        res.status(400).json({"message": "error", "error": err });
       } else {
-        res.json({"message": "success", "status": "201",  "body": result });
+        var query = "SELECT ID, name, email, phone, password, user_type FROM projetofinalpw.users WHERE id = ?;";
+        createConnection.query(query, result.insertId, function (err, rows){
+          if (err) {
+            res.status(400).json({"message": "error", "error": err });
+          } else {
+            res.status(201).json({"message": "success", "person": rows[0] });
+          }  
+        });
       }
       createConnection.end();
     });
 }
 
-function updatePerson(req, res) {
+function updateUser(req, res) {
     var updateConnection = mysql.createConnection(options);
     updateConnection.connect();
     var query = "UPDATE person SET name = ?, birthDate = ?, idCountry = ? WHERE id = ?";
@@ -59,7 +66,7 @@ function updatePerson(req, res) {
     });
 }
 
-function deletePerson(req, res) {
+function deleteUser(req, res) {
     var deleteConnection = mysql.createConnection(options);
     deleteConnection.connect();
     var query = "DELETE FROM person WHERE id = ?";
@@ -143,11 +150,11 @@ function deleteCountry(req, res) {
 }
 
 module.exports = {
-    getPeople: getPeople,
-    getPerson: getPersonById,
+    getUser: getUser,
+    getUserById: getUserById,
     createUser: createUser,
-    updatePerson: updatePerson,
-    deletePerson: deletePerson,
+    updateUser: updateUser,
+    deleteUser: deleteUser,
     getCountries: getCountries,
     getCountry: getCountryById,
     createCountry: createCountry,

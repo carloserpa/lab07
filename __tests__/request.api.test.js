@@ -1,26 +1,39 @@
 // Arquivo: user.api.test.js
 
-const express = require('express')
-const request = require('supertest')
-const chalk = require("chalk");
-const app = require('../app')
+var express = require("express");
+var bodyParser = require('body-parser');
 
-describe('API de usuários', () => {
-  it('deve criar um novo usuário corretamente', async () => {
+var app = express();
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+const request = require("supertest")
+
+const api = require("../app.js")
+
+describe("API de usuários", () => {
+  it("deve criar um novo usuário corretamente", async () => {
     // Arrange
-    const newUser = { name: 'Carlos', email: 'carlos@example.com', phone: '320549879586',
-      password: '111111111', user_type: 'ADMIN'
+    const newUser = { 
+          name:"jOAO", 
+          email:"JOAO@example.com", 
+          phone:"320549879586",
+          password:"222222222", 
+          user_type:"USER"
      };
     
     // Act
-    const response = await request(app).post('/user').send(newUser);
+    const response = await request(api)
+            .post("/user")
+            .set('Content-Type', 'application/json')
+            .send(newUser);
     
     // Assert
-    expect(response.status).toBe(201);
-    expect(response.body.name).toBe(newUser.name);
-    expect(response.body.email).toBe(newUser.email);
-    expect(response.body.phone).toBe(newUser.phone);
-    expect(response.body.password).toBe(newUser.password);
-    expect(response.body.user_type).toBe(newUser.user_type);
+    request.expect(response.status).toBe(201);
+    request.expect(response.body.name).toBe(newUser.name);
+    request.expect(response.body.email).toBe(newUser.email);
+    request.expect(response.body.phone).toBe(newUser.phone);
+    request.expect(response.body.password).toBe(newUser.password);
+    request.expect(response.body.user_type).toBe(newUser.user_type);
   });
 });

@@ -4,14 +4,15 @@ const requestHandlers = require("./request-handlers.js");//importando os manipul
 
 const app =  express();
 app.use(express.static("www"));//arquivos estaticos
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));//para fazer a interpretacao do body
 
 // People
-app.get("/user", requestHandlers.getPeople);
-app.get("/user/:id", requestHandlers.getPerson);
+app.get("/user", requestHandlers.getUser);
+app.get("/user/:id", requestHandlers.getUserById);
 app.post("/user", requestHandlers.createUser);
-app.put("/user/:id", requestHandlers.updatePerson);
-app.delete("/user/:id", requestHandlers.deletePerson);
+app.put("/user/:id", requestHandlers.updateUser);
+app.delete("/user/:id", requestHandlers.deleteUser);
 
 // Countries
 app.get("/country", requestHandlers.getCountries);
