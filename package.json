@@ -2,7 +2,23 @@
   "dependencies": {
     "body-parser": "^1.20.2",
     "express": "^4.19.2",
-    "mysql": "^2.18.1",
+    "mysql": "^2.18.1"
+  },
+  "devDependencies": {
+    "jest": "^25.2.2",
     "supertest": "^7.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
+  },
+  "scripts": {
+    "start-dev": "nodemon index.js",
+    "migrate": "npx sequelize-cli db:migrate",
+    "migrate:reset": "npx sequelize-cli db:migrate:undo:all && npm run migrate",
+    "test": "cross-env NODE_ENV=test jest --testTimeout=10000",
+    "pretest": "cross-env NODE_ENV=test npm run migrate:reset"
   }
 }

@@ -22,14 +22,16 @@ class Information {
 
       addPerson() {
         var data = {};
-        data.name=document.getElementById("personName").value;
-        data.birthDate=document.getElementById("personDate").value;
-        data.idCountry=document.getElementById("personCountry").value;
+        data.name=document.getElementById("userName").value;
+        data.email=document.getElementById("userEmail").value;
+        data.phone=document.getElementById("userPhone").value;
+        data.password=document.getElementById("userPassword").value;
+        data.userType=document.getElementById("userType").value;
         var json = JSON.stringify(data);
 
         let self=this;
         const xhr = new XMLHttpRequest();
-        xhr.open("POST", "person", true);
+        xhr.open("POST", "user", true);
         xhr.setRequestHeader('Content-type','application/json; charset=utf-8');
         xhr.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
@@ -39,7 +41,7 @@ class Information {
         xhr.send();
       }
 
-      getPerson() {
+      getUsers() {
         let self=this;
         const xhr = new XMLHttpRequest();
         xhr.open("GET", "person", true);

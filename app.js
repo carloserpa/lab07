@@ -7,11 +7,11 @@ app.use(express.static("www"));//arquivos estaticos
 app.use(bodyParser.urlencoded({ extended: true }));//para fazer a interpretacao do body
 
 // People
-app.get("/person", requestHandlers.getPeople);
-app.get("/person/:id", requestHandlers.getPerson);
-app.post("/person", requestHandlers.createPerson);
-app.put("/person/:id", requestHandlers.updatePerson);
-app.delete("/person/:id", requestHandlers.deletePerson);
+app.get("/user", requestHandlers.getPeople);
+app.get("/user/:id", requestHandlers.getPerson);
+app.post("/user", requestHandlers.createUser);
+app.put("/user/:id", requestHandlers.updatePerson);
+app.delete("/user/:id", requestHandlers.deletePerson);
 
 // Countries
 app.get("/country", requestHandlers.getCountries);

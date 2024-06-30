@@ -31,15 +31,15 @@ function getPersonById(req, res) {
 
 }
 
-function createPerson(req, res) {
+function createUser(req, res) {
     var createConnection = mysql.createConnection(options);
     createConnection.connect();
-    var query = "INSERT INTO person (name, birthDate, idCountry) VALUES (?, ?, ?)";
-    createConnection.query(query, [req.body.name, req.body.birthDate, req.body.idCountry], function (err, result) {
+    var query = "INSERT INTO projetofinalpw.users(name, email, phone, password, type_use) VALUES(?, ?, ?, ?, ?)";
+    createConnection.query(query, [req.body.name, req.body.email, req.body.phone, req.body.password, req.body.user_type], function (err, result) {
       if (err) {
         res.json({"message": "error", "error": err });
       } else {
-        res.json({"message": "success", "person": result.insertId });
+        res.json({"message": "success", "status": "201",  "body": result });
       }
       createConnection.end();
     });
@@ -145,7 +145,7 @@ function deleteCountry(req, res) {
 module.exports = {
     getPeople: getPeople,
     getPerson: getPersonById,
-    createPerson: createPerson,
+    createUser: createUser,
     updatePerson: updatePerson,
     deletePerson: deletePerson,
     getCountries: getCountries,
