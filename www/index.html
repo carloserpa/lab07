@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="utf-8">
+    <title>Laboratório 4</title>
+    <link type="text/css" href="/styles/styles.css" rel="stylesheet">
+    <script src="scripts/country.js"></script>
+    <script src="scripts/person.js"></script>
+    <script src="scripts/information.js"></script>
+    <script src="/scripts/main.js"></script>
+</head>
+<body>    
+    <nav>
+        <ul class="menu">
+            <li><a id="menuHome" href="javascript: info.showHome();">Home</a></li>
+            <li><a id="menuPerson" href="javascript: info.showPerson();">Person</a></li>
+            <li><a id="menuCountry" href="javascript: info.showCountry();">Country</a></li>
+        </ul>
+    </nav>
+    <main>
+        <article>
+            <h1 id="headerTitle">Home</h1>
+            <div id="divInformation"></div>
+            <div id="divForm">
+                <form action="javascript: info.addPerson();">
+                    <input id="personId" type="hidden" />
+                    <div>
+                        <label for="personName">Name</label>
+                        <input id="personName" type="text" />
+                    </div>
+                    <div>
+                        <label for="personDate">Birth Date</label>
+                        <input id="personDate" type="date" />
+                    </div>
+                    <div>
+                        <label for="personCountry">Country</label>
+                        <select id="personCountry"></select>
+                    </div>
+                    <div>
+                        <button type="reset">clear</button>
+                        <button type="submit">add</button>
+                    </div>
+                </form>
+            </div>
+        </article>
+    </main>
+</body>
+</html>
