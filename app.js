@@ -24,3 +24,4 @@ app.listen(8081, function () {
     console.log("Server running at http://localhost:8081");
 });
 
+module.exports = app

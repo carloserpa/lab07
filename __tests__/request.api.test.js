@@ -1,6 +1,8 @@
 // Arquivo: user.api.test.js
 
-const request = require('supertest');
+const express = require('express')
+const request = require('supertest')
+const chalk = require("chalk");
 const app = require('../app')
 
 describe('API de usuários', () => {
