@@ -11,6 +11,7 @@ app.use(bodyParser.urlencoded({ extended: true }));//para fazer a interpretacao 
 app.get("/user", requestHandlers.getUser);
 app.get("/user/:id", requestHandlers.getUserById);
 app.post("/user", requestHandlers.createUser);
+app.post("/user/auth", requestHandlers.authUser);
 app.put("/user/:id", requestHandlers.updateUser);
 app.delete("/user/:id", requestHandlers.deleteUser);
 

@@ -1,3 +1,4 @@
+const crypto = require("crypto")
 const express = require('express');
 const mysql = require("mysql");
 const options = require("./connection-options.json");
@@ -34,12 +35,13 @@ function getUserById(req, res) {
 function createUser(req, res) {
     var createConnection = mysql.createConnection(options);
     createConnection.connect();   
-    var query = "INSERT INTO projetofinalpw.users(name, email, phone, password, user_type) VALUES(?, ?, ?, ?, ?)";
-    createConnection.query(query, [req.body.name, req.body.email, req.body.phone, req.body.password, req.body.user_type], function (err, result) {
+    var query = "INSERT INTO projetofinalpw.users(name, email, phone, password, salt,user_type) VALUES(?, ?, ?, ?, ?, ?)";
+    var password = generatePassword(req.body.password)
+    createConnection.query(query, [req.body.name, req.body.email, req.body.phone, password.hash, password.salt,req.body.user_type], function (err, result) {
       if (err) {
         res.status(400).json({"message": "error", "error": err });
       } else {
-        var query = "SELECT id, name, email, phone, password, user_type FROM projetofinalpw.users WHERE id = ?;";
+        var query = "SELECT id, name, email, phone, password, salt, user_type FROM projetofinalpw.users WHERE id = ?;";
         createConnection.query(query, result.insertId, function (err, rows){
           if (err) {
             res.status(400).json({"message": "error", "error": err });
@@ -54,14 +56,14 @@ function createUser(req, res) {
 
 function updateUser(req, res) {
     var updateConnection = mysql.createConnection(options);
-    updateConnection.connect();
-    
-    var query = "UPDATE projetofinalpw.users SET name = ?, email = ?, phone = ?, password = ? , user_type= ? WHERE id = ?";
-    updateConnection.query(query, [req.body.name, req.body.email, req.body.phone, req.body.password, req.body.user_type, req.params.id], function (err, result) {
+    updateConnection.connect();    
+    var query = "UPDATE projetofinalpw.users SET name = ?, email = ?, phone = ?, password = ?, salt = ? , user_type= ? WHERE id = ?";
+    var password = generatePassword(req.body.password)
+    updateConnection.query(query, [req.body.name, req.body.email, req.body.phone, password.hash, password.salt, req.body.user_type, req.params.id], function (err, result) {
       if (err) {
         res.status(400).json({"message": "error", "error": err });
       } else {
-        var query = "SELECT id, name, email, phone, password, user_type FROM projetofinalpw.users WHERE id = ?;";        
+        var query = "SELECT id, name, email, phone, password, salt, user_type FROM projetofinalpw.users WHERE id = ?;";        
         updateConnection.query(query, req.params.id, function (err, rows){
           if (err) {
             res.status(400).json({"message": "error", "error": err });
@@ -88,73 +90,38 @@ function deleteUser(req, res) {
     });
 }
 
-function getCountries(req, res) {
-    var connection = mysql.createConnection(options);
-    connection.connect();
-    var query = "SELECT id, name, shortName FROM country";
-    connection.query(query, function (err, rows) {
-      if (err) {
-        res.json({"message": "error", "error": err });
-      } else {
-        res.json({"message": "success", "countries": rows });
-      }
-    });
+function authUser(req, res) {
+  var createConnection = mysql.createConnection(options);  
+  createConnection.connect();   
+  var query = "SELECT email, password, salt FROM projetofinalpw.users where email = ?";
+  createConnection.query(query, [req.body.email], function (err, rows) {    
+    if (err) {
+      res.status(400).json({"message": "error", "error": err });
+    } else {
+        var checkHash = rows[0].password
+        var checkSalt = rows[0].salt   
+        if (validPassword(req.body.password, checkHash, checkSalt)) {
+          res.status(200).json({"message": "success", "auth": true });
+        } else {
+          res.status(200).json({"message": "success", "auth": false });
+        }                   
+    }
+    createConnection.end();
+  });
 }
 
-function getCountryById(req, res) {
-    var connection = mysql.createConnection(options);
-    connection.connect();
-    var query = "SELECT id, name, shortName FROM country WHERE id = ?";
-    connection.query(query, [req.params.id], function (err, rows) {
-      if (err) {
-        res.json({"message": "error", "error": err });
-      } else {
-        res.json({"message": "success", "country": rows[0] });
-      }
-      connection.end();
-    });
-}
 
-function createCountry(req, res) {
-    var createConnection = mysql.createConnection(options);
-    createConnection.connect();
-    var query = "INSERT INTO country (name, shortName) VALUES (?, ?)";
-    createConnection.query(query, [req.body.name, req.body.shortName], function (err, result) {
-      if (err) {
-        res.json({"message": "error", "error": err });
-      } else {
-        res.json({"message": "success", "country": result.insertId });
-      }
-      createConnection.end();
-    });
+function generatePassword(password) {
+    const salt = crypto.randomBytes(32).toString('hex')
+    const genHash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex')
+    return {
+        salt: salt,
+        hash: genHash
+    }
 }
-
-function updateCountry(req, res) {
-    var updateConnection = mysql.createConnection(options);
-    updateConnection.connect();
-    var query = "UPDATE country SET name = ?, shortName = ? WHERE id = ?";
-    updateConnection.query(query, [req.body.name, req.body.shortName, req.params.id], function (err, result) {
-      if (err) {
-        res.json({"message": "error", "error": err });
-      } else {
-        res.json({"message": "success", "country": req.params.id });
-      }
-      updateConnection.end();
-    });
-}
-
-function deleteCountry(req, res) {
-    var deleteConnection = mysql.createConnection(options);
-    deleteConnection.connect();
-    var query = "DELETE FROM country WHERE id = ?";
-    deleteConnection.query(query, [req.params.id], function (err, result) {
-      if (err) {
-        res.json({"message": "error", "error": err });
-      } else {
-        res.json({"message": "success", "country": req.params.id });
-      }
-      deleteConnection.end();
-    });
+function validPassword(password, hash, salt) {
+    const checkHash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex')
+    return hash === checkHash
 }
 
 module.exports = {
@@ -163,9 +130,5 @@ module.exports = {
     createUser: createUser,
     updateUser: updateUser,
     deleteUser: deleteUser,
-    getCountries: getCountries,
-    getCountry: getCountryById,
-    createCountry: createCountry,
-    updateCountry: updateCountry,
-    deleteCountry: deleteCountry
+    authUser: authUser
 };
