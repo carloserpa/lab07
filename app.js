@@ -15,12 +15,6 @@ app.post("/user/auth", requestHandlers.authUser);
 app.put("/user/:id", requestHandlers.updateUser);
 app.delete("/user/:id", requestHandlers.deleteUser);
 
-// Countries
-app.get("/country", requestHandlers.getCountries);
-app.get("/country/:id", requestHandlers.getCountry);
-app.post("/country", requestHandlers.createCountry);
-app.put("/country/:id", requestHandlers.updateCountry);
-app.delete("/country/:id", requestHandlers.deleteCountry);
 
 app.listen(8081, function () {
     console.log("Server running at http://localhost:8081");

@@ -8,7 +8,7 @@
 window.onload = function (event) {
     var info = new Information("divInformation");
     info.getPerson();
-    info.getCountry();
+    //info.getCountry();
     window.info = info;
     var divForm = document.getElementById("divForm");  
 
